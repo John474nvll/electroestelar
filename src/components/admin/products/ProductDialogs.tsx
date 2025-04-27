@@ -1,10 +1,8 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, 
-  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction 
-} from "@/components/ui/alert-dialog";
-import ProductForm from "../ProductForm";
 import { IProduct } from "@/types/product";
+import { AddProductDialog } from "./AddProductDialog";
+import { EditProductDialog } from "./EditProductDialog";
+import { DeleteProductDialog } from "./DeleteProductDialog";
 
 interface ProductDialogsProps {
   isAddDialogOpen: boolean;
@@ -33,64 +31,24 @@ export const ProductDialogs = ({
 }: ProductDialogsProps) => {
   return (
     <>
-      <Dialog open={isAddDialogOpen} onOpenChange={onCloseAddDialog}>
-        <DialogContent className="sm:max-w-[700px]">
-          <DialogHeader>
-            <DialogTitle>Añadir Nuevo Producto</DialogTitle>
-            <DialogDescription>
-              Complete el formulario para agregar un nuevo producto al catálogo.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <ProductForm 
-              onSubmitSuccess={onAddProduct} 
-              onCancel={onCloseAddDialog} 
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AddProductDialog 
+        isOpen={isAddDialogOpen}
+        onClose={onCloseAddDialog}
+        onSubmit={onAddProduct}
+      />
 
-      <Dialog open={isEditDialogOpen} onOpenChange={onCloseEditDialog}>
-        <DialogContent className="sm:max-w-[700px]">
-          <DialogHeader>
-            <DialogTitle>Editar Producto</DialogTitle>
-            <DialogDescription>
-              Modifique los detalles del producto.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            {selectedProduct && (
-              <ProductForm 
-                productToEdit={selectedProduct}
-                onSubmitSuccess={onEditProduct}
-                onCancel={onCloseEditDialog}
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EditProductDialog 
+        isOpen={isEditDialogOpen}
+        onClose={onCloseEditDialog}
+        onSubmit={onEditProduct}
+        product={selectedProduct}
+      />
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={onCloseDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. El producto será eliminado permanentemente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={onCloseDeleteDialog}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={onDeleteProduct}
-              className="bg-red-500 text-white hover:bg-red-600"
-            >
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteProductDialog 
+        isOpen={isDeleteDialogOpen}
+        onClose={onCloseDeleteDialog}
+        onConfirm={onDeleteProduct}
+      />
     </>
   );
 };

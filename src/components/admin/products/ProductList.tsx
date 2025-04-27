@@ -1,9 +1,11 @@
 
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Edit, Trash } from "lucide-react";
+import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { IProduct } from "@/types/product";
 import { formatPrice } from "@/utils/formatters";
+import { ProductTableHeader } from "./ProductTableHeader";
+import { ProductFeaturedBadge } from "./ProductFeaturedBadge";
+import { ProductRowActions } from "./ProductRowActions";
+import { ProductEmptyState } from "./ProductEmptyState";
 
 interface ProductListProps {
   products: IProduct[];
@@ -23,16 +25,7 @@ export const ProductList = ({ products, onEdit, onDelete }: ProductListProps) =>
 
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Imagen</TableHead>
-          <TableHead>Nombre</TableHead>
-          <TableHead>Categoría</TableHead>
-          <TableHead>Precio</TableHead>
-          <TableHead>Destacado</TableHead>
-          <TableHead>Acciones</TableHead>
-        </TableRow>
-      </TableHeader>
+      <ProductTableHeader />
       <TableBody>
         {products.length > 0 ? (
           products.map((product) => (
@@ -48,39 +41,18 @@ export const ProductList = ({ products, onEdit, onDelete }: ProductListProps) =>
               <TableCell>{getCategoryName(product.category)}</TableCell>
               <TableCell>{formatPrice(product.price)}</TableCell>
               <TableCell>
-                {product.featured ? (
-                  <span className="px-2 py-1 rounded-full bg-green-100 text-green-600 text-xs">Sí</span>
-                ) : (
-                  <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs">No</span>
-                )}
+                <ProductFeaturedBadge featured={product.featured} />
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    onClick={() => onEdit(product)}
-                  >
-                    <Edit size={16} />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="text-red-500" 
-                    onClick={() => onDelete(product.id)}
-                  >
-                    <Trash size={16} />
-                  </Button>
-                </div>
+                <ProductRowActions 
+                  onEdit={() => onEdit(product)}
+                  onDelete={() => onDelete(product.id)}
+                />
               </TableCell>
             </TableRow>
           ))
         ) : (
-          <TableRow>
-            <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-              No se encontraron productos que coincidan con los criterios de búsqueda
-            </TableCell>
-          </TableRow>
+          <ProductEmptyState />
         )}
       </TableBody>
     </Table>
