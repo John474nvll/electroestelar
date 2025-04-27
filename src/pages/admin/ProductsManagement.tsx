@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Table, TableHeader, TableRow, TableHead, 
@@ -24,9 +25,10 @@ const ProductsManagement = () => {
   const [localProducts, setLocalProducts] = useState<IProduct[]>(
     products.map(p => ({
       ...p,
-      stock: 10,
+      stock: p.stock || 10, // Use stock if it exists, otherwise default to 10
       additionalImages: [],
-      mainImage: p.image
+      mainImage: p.image,
+      featured: p.featured !== undefined ? p.featured : false // Ensure featured is always defined
     }))
   );
   const [productToDelete, setProductToDelete] = useState<string | null>(null);

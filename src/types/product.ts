@@ -6,7 +6,7 @@ export interface IProduct {
   price: number;
   stock: number;
   category: string;
-  featured: boolean;
+  featured: boolean; // This remains required, but we'll ensure all products have it
   mainImage: string;
   additionalImages: string[];
 }

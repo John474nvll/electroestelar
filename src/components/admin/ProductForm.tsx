@@ -51,9 +51,9 @@ const ProductForm = ({ productToEdit, onSubmitSuccess, onCancel }: ProductFormPr
         name: productToEdit.name,
         description: productToEdit.description,
         price: String(productToEdit.price),
-        stock: productToEdit.stock ? String(productToEdit.stock) : "10", // Default value if not present
+        stock: String(productToEdit.stock || 10), // Default value if not present
         category: productToEdit.category,
-        featured: productToEdit.featured || false,
+        featured: productToEdit.featured,
       });
       
       setMainImageUrl(productToEdit.mainImage);
