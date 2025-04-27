@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Search, Plus, Edit, Trash } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
+import ProductForm from "@/components/admin/ProductForm";
 import { Product, products } from "@/data/products";
 import { formatPrice } from "@/utils/formatters";
 
@@ -43,12 +44,12 @@ const ProductsManagement = () => {
                 Nuevo Producto
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[700px]">
               <DialogHeader>
                 <DialogTitle>Añadir Nuevo Producto</DialogTitle>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <p className="text-gray-500">Formulario para añadir productos (implementación futura)</p>
+              <div className="py-4">
+                <ProductForm />
               </div>
             </DialogContent>
           </Dialog>
