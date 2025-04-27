@@ -4,10 +4,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image, Plus, FileImage } from "lucide-react";
+import { Plus } from "lucide-react";
 import * as z from "zod";
+import ProductImageUpload from "./ProductImageUpload";
+import { ProductFormValues } from "@/types/product";
 
 const formSchema = z.object({
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -15,9 +18,8 @@ const formSchema = z.object({
   price: z.string().regex(/^\d+$/, "El precio debe ser un número válido"),
   stock: z.string().regex(/^\d+$/, "El stock debe ser un número válido"),
   category: z.string().min(1, "Selecciona una categoría"),
+  featured: z.boolean().default(false),
 });
-
-export type ProductFormValues = z.infer<typeof formSchema>;
 
 const ProductForm = () => {
   const [mainImage, setMainImage] = useState<File | null>(null);
@@ -31,120 +33,76 @@ const ProductForm = () => {
       price: "",
       stock: "",
       category: "",
+      featured: false,
     },
   });
 
-  const onSubmit = (data: ProductFormValues) => {
-    // Handle form submission here
-    console.log("Form data:", data);
-    console.log("Main image:", mainImage);
-    console.log("Additional images:", additionalImages);
-  };
+  const onSubmit = async (data: ProductFormValues) => {
+    const formattedData = {
+      ...data,
+      price: Number(data.price),
+      stock: Number(data.stock),
+      mainImage: mainImage ? URL.createObjectURL(mainImage) : "",
+      additionalImages: additionalImages.map(img => URL.createObjectURL(img)),
+      id: crypto.randomUUID(),
+    };
 
-  const handleMainImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setMainImage(e.target.files[0]);
-    }
-  };
-
-  const handleAdditionalImagesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newImages = Array.from(e.target.files);
-      if (additionalImages.length + newImages.length <= 3) {
-        setAdditionalImages([...additionalImages, ...newImages]);
-      }
-    }
+    // Add the product to the products array (in a real app, this would be an API call)
+    console.log("Nuevo producto:", formattedData);
+    // Reset form
+    form.reset();
+    setMainImage(null);
+    setAdditionalImages([]);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Imagen Principal */}
-        <div className="space-y-2">
-          <FormLabel>Imagen Principal</FormLabel>
-          <div className="flex items-center gap-4">
-            <div
-              className={`w-32 h-32 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-electroestelar-orange transition-colors ${
-                mainImage ? "border-electroestelar-blue" : "border-gray-300"
-              }`}
-            >
-              <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center">
-                {mainImage ? (
-                  <img
-                    src={URL.createObjectURL(mainImage)}
-                    alt="Vista previa"
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <Image className="w-8 h-8 text-gray-400" />
-                    <span className="text-sm text-gray-500">Subir imagen</span>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleMainImageUpload}
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Imágenes Adicionales */}
-        <div className="space-y-2">
-          <FormLabel>Imágenes Adicionales (máx. 3)</FormLabel>
-          <div className="flex items-center gap-4">
-            {[...Array(3)].map((_, index) => (
-              <div
-                key={index}
-                className={`w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-electroestelar-orange transition-colors ${
-                  additionalImages[index] ? "border-electroestelar-blue" : "border-gray-300"
-                }`}
-              >
-                <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center">
-                  {additionalImages[index] ? (
-                    <img
-                      src={URL.createObjectURL(additionalImages[index])}
-                      alt={`Imagen adicional ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-1">
-                      <FileImage className="w-6 h-6 text-gray-400" />
-                      <span className="text-xs text-gray-500">Imagen {index + 1}</span>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAdditionalImagesUpload}
-                    disabled={additionalImages.length >= 3 && !additionalImages[index]}
-                  />
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Nombre del Producto */}
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre del Producto</FormLabel>
-              <FormControl>
-                <Input placeholder="Ej: Refrigerador Samsung Digital Inverter" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <ProductImageUpload
+          mainImage={mainImage}
+          additionalImages={additionalImages}
+          onMainImageChange={setMainImage}
+          onAdditionalImagesChange={setAdditionalImages}
         />
 
-        {/* Descripción */}
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ej: Smart TV 55'" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Categoría</FormLabel>
+                <FormControl>
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    {...field}
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="furniture">Muebles</option>
+                    <option value="appliances">Electrodomésticos</option>
+                    <option value="technology">Tecnología</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="description"
@@ -153,8 +111,8 @@ const ProductForm = () => {
               <FormLabel>Descripción</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe las características principales del producto..."
-                  className="min-h-[100px]"
+                  placeholder="Describe las características del producto..."
+                  className="resize-none h-20"
                   {...field}
                 />
               </FormControl>
@@ -163,63 +121,48 @@ const ProductForm = () => {
           )}
         />
 
-        {/* Precio */}
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Precio (COP)</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="Ej: 1299900" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="stock"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Stock</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="Ej: 10" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
-          name="price"
+          name="featured"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Precio (COP)</FormLabel>
+            <FormItem className="flex flex-row items-center space-x-2 space-y-0">
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Ej: 1299900"
-                  {...field}
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Stock */}
-        <FormField
-          control={form.control}
-          name="stock"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Stock Disponible</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Ej: 10"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Categoría */}
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Categoría</FormLabel>
-              <FormControl>
-                <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  {...field}
-                >
-                  <option value="">Seleccionar categoría</option>
-                  <option value="furniture">Muebles</option>
-                  <option value="appliances">Electrodomésticos</option>
-                  <option value="technology">Tecnología</option>
-                </select>
-              </FormControl>
-              <FormMessage />
+              <FormLabel className="text-sm font-normal">Marcar como producto destacado</FormLabel>
             </FormItem>
           )}
         />
