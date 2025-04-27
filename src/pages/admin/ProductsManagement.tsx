@@ -25,7 +25,7 @@ const ProductsManagement = () => {
   const [localProducts, setLocalProducts] = useState<IProduct[]>(
     products.map(p => ({
       ...p,
-      stock: p.stock || 10, // Use stock if it exists, otherwise default to 10
+      stock: 10, // Default value for stock since it doesn't exist in Product type
       additionalImages: [],
       mainImage: p.image,
       featured: p.featured !== undefined ? p.featured : false // Ensure featured is always defined
