@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import * as z from "zod";
 import ProductImageUpload from "./ProductImageUpload";
+import ProductCategorySelect from "./ProductCategorySelect";
 import { ProductFormValues } from "@/types/product";
 
 const formSchema = z.object({
@@ -47,9 +48,7 @@ const ProductForm = () => {
       id: crypto.randomUUID(),
     };
 
-    // Add the product to the products array (in a real app, this would be an API call)
     console.log("Nuevo producto:", formattedData);
-    // Reset form
     form.reset();
     setMainImage(null);
     setAdditionalImages([]);
@@ -80,27 +79,7 @@ const ProductForm = () => {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Categoría</FormLabel>
-                <FormControl>
-                  <select
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    {...field}
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="furniture">Muebles</option>
-                    <option value="appliances">Electrodomésticos</option>
-                    <option value="technology">Tecnología</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <ProductCategorySelect form={form} />
         </div>
 
         <FormField
