@@ -1,26 +1,13 @@
 
 import { useState, useEffect } from "react";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Save } from "lucide-react";
-import * as z from "zod";
-import ProductImageUpload from "./ProductImageUpload";
-import ProductCategorySelect from "./ProductCategorySelect";
 import { ProductFormValues, IProduct } from "@/types/product";
-
-const formSchema = z.object({
-  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-  price: z.string().regex(/^\d+$/, "El precio debe ser un número válido"),
-  stock: z.string().regex(/^\d+$/, "El stock debe ser un número válido"),
-  category: z.string().min(1, "Selecciona una categoría"),
-  featured: z.boolean().default(false),
-});
+import { productFormSchema } from "./schemas/productFormSchema";
+import { ProductDetailsFields } from "./ProductDetailsFields";
+import { ProductFormActions } from "./ProductFormActions";
+import ProductImageUpload from "./ProductImageUpload";
 
 interface ProductFormProps {
   productToEdit?: IProduct;
@@ -34,7 +21,7 @@ const ProductForm = ({ productToEdit, onSubmitSuccess, onCancel }: ProductFormPr
   const [mainImageUrl, setMainImageUrl] = useState<string>("");
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
       name: productToEdit?.name || "",
       description: productToEdit?.description || "",
@@ -51,16 +38,12 @@ const ProductForm = ({ productToEdit, onSubmitSuccess, onCancel }: ProductFormPr
         name: productToEdit.name,
         description: productToEdit.description,
         price: String(productToEdit.price),
-        stock: String(productToEdit.stock || 10), // Default value if not present
+        stock: String(productToEdit.stock || 10),
         category: productToEdit.category,
         featured: productToEdit.featured,
       });
       
       setMainImageUrl(productToEdit.mainImage);
-      // For additional images, use the ones from the product if available
-      if (productToEdit.additionalImages && productToEdit.additionalImages.length > 0) {
-        // In a real app, we would load these images here
-      }
     }
   }, [productToEdit, form]);
 
@@ -82,7 +65,6 @@ const ProductForm = ({ productToEdit, onSubmitSuccess, onCancel }: ProductFormPr
     onSubmitSuccess(formattedData);
     
     if (!productToEdit) {
-      // Only reset if adding a new product
       form.reset();
       setMainImage(null);
       setAdditionalImages([]);
@@ -100,104 +82,12 @@ const ProductForm = ({ productToEdit, onSubmitSuccess, onCancel }: ProductFormPr
           existingMainImageUrl={mainImageUrl}
         />
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ej: Smart TV 55'" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <ProductDetailsFields form={form} />
 
-          <ProductCategorySelect form={form} />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Descripción</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Describe las características del producto..."
-                  className="resize-none h-20"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <ProductFormActions 
+          isEditing={!!productToEdit} 
+          onCancel={onCancel}
         />
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Precio (COP)</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="Ej: 1299900" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="stock"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Stock</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="Ej: 10" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="featured"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <FormLabel className="text-sm font-normal">Marcar como producto destacado</FormLabel>
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end space-x-2 pt-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
-          </Button>
-          <Button type="submit" className="bg-electroestelar-orange hover:bg-electroestelar-orange/90">
-            {productToEdit ? (
-              <>
-                <Save className="mr-2 h-4 w-4" /> Guardar Cambios
-              </>
-            ) : (
-              <>
-                <Plus className="mr-2 h-4 w-4" /> Añadir Producto
-              </>
-            )}
-          </Button>
-        </div>
       </form>
     </Form>
   );
