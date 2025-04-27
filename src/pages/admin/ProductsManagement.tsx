@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Table, TableHeader, TableRow, TableHead, 
@@ -11,17 +10,25 @@ import { toast } from "@/components/ui/use-toast";
 import { Search, Plus, Edit, Trash } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import ProductForm from "@/components/admin/ProductForm";
-import { Product, products } from "@/data/products";
+import { IProduct } from "@/types/product";
+import { products } from "@/data/products";
 import { formatPrice } from "@/utils/formatters";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const ProductsManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
   const [isEditProductDialogOpen, setIsEditProductDialogOpen] = useState(false);
-  const [localProducts, setLocalProducts] = useState<Product[]>(products);
+  const [localProducts, setLocalProducts] = useState<IProduct[]>(
+    products.map(p => ({
+      ...p,
+      stock: 10,
+      additionalImages: [],
+      mainImage: p.image
+    }))
+  );
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
   const filteredProducts = localProducts.filter(product => 
@@ -38,7 +45,7 @@ const ProductsManagement = () => {
     }
   };
 
-  const handleAddProduct = (newProduct: Product) => {
+  const handleAddProduct = (newProduct: IProduct) => {
     setLocalProducts(prev => [...prev, newProduct]);
     setIsAddProductDialogOpen(false);
     toast({
@@ -47,7 +54,7 @@ const ProductsManagement = () => {
     });
   };
 
-  const handleEditProduct = (updatedProduct: Product) => {
+  const handleEditProduct = (updatedProduct: IProduct) => {
     setLocalProducts(prev => 
       prev.map(product => 
         product.id === updatedProduct.id ? updatedProduct : product
@@ -75,7 +82,7 @@ const ProductsManagement = () => {
     }
   };
 
-  const openEditDialog = (product: Product) => {
+  const openEditDialog = (product: IProduct) => {
     setSelectedProduct(product);
     setIsEditProductDialogOpen(true);
   };
@@ -138,47 +145,51 @@ const ProductsManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
-                    <img 
-                      src={product.image} 
-                      alt={product.name} 
-                      className="w-12 h-12 object-cover rounded"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{getCategoryName(product.category)}</TableCell>
-                  <TableCell>{formatPrice(product.price)}</TableCell>
-                  <TableCell>
-                    {product.featured ? (
-                      <span className="px-2 py-1 rounded-full bg-green-100 text-green-600 text-xs">Sí</span>
-                    ) : (
-                      <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs">No</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onClick={() => openEditDialog(product)}
-                      >
-                        <Edit size={16} />
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        className="text-red-500" 
-                        onClick={() => openDeleteDialog(product.id)}
-                      >
-                        <Trash size={16} />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredProducts.length === 0 && (
+              {localProducts.length > 0 ? (
+                localProducts.filter(product => 
+                  product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  product.category.toLowerCase().includes(searchTerm.toLowerCase())
+                ).map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      <img 
+                        src={product.mainImage} 
+                        alt={product.name} 
+                        className="w-12 h-12 object-cover rounded"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell>{getCategoryName(product.category)}</TableCell>
+                    <TableCell>{formatPrice(product.price)}</TableCell>
+                    <TableCell>
+                      {product.featured ? (
+                        <span className="px-2 py-1 rounded-full bg-green-100 text-green-600 text-xs">Sí</span>
+                      ) : (
+                        <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs">No</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => openEditDialog(product)}
+                        >
+                          <Edit size={16} />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="text-red-500" 
+                          onClick={() => openDeleteDialog(product.id)}
+                        >
+                          <Trash size={16} />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                     No se encontraron productos que coincidan con los criterios de búsqueda

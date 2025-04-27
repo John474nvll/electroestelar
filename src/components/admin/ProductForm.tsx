@@ -11,8 +11,7 @@ import { Plus, Save } from "lucide-react";
 import * as z from "zod";
 import ProductImageUpload from "./ProductImageUpload";
 import ProductCategorySelect from "./ProductCategorySelect";
-import { ProductFormValues } from "@/types/product";
-import { Product } from "@/data/products";
+import { ProductFormValues, IProduct } from "@/types/product";
 
 const formSchema = z.object({
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -24,8 +23,8 @@ const formSchema = z.object({
 });
 
 interface ProductFormProps {
-  productToEdit?: Product;
-  onSubmitSuccess: (product: Product) => void;
+  productToEdit?: IProduct;
+  onSubmitSuccess: (product: IProduct) => void;
   onCancel: () => void;
 }
 
@@ -57,15 +56,18 @@ const ProductForm = ({ productToEdit, onSubmitSuccess, onCancel }: ProductFormPr
         featured: productToEdit.featured || false,
       });
       
-      setMainImageUrl(productToEdit.image);
-      // For a real app, we would also set additional images here
+      setMainImageUrl(productToEdit.mainImage);
+      // For additional images, use the ones from the product if available
+      if (productToEdit.additionalImages && productToEdit.additionalImages.length > 0) {
+        // In a real app, we would load these images here
+      }
     }
   }, [productToEdit, form]);
 
   const onSubmit = async (data: ProductFormValues) => {
     const productId = productToEdit ? productToEdit.id : crypto.randomUUID();
     
-    const formattedData: Product = {
+    const formattedData: IProduct = {
       id: productId,
       name: data.name,
       description: data.description,
@@ -73,8 +75,7 @@ const ProductForm = ({ productToEdit, onSubmitSuccess, onCancel }: ProductFormPr
       stock: Number(data.stock),
       category: data.category,
       featured: data.featured,
-      image: mainImage ? URL.createObjectURL(mainImage) : (mainImageUrl || "https://images.unsplash.com/photo-1595428774223-ef52624120d2"),
-      // In a real app, we would handle the upload of these images to a server
+      mainImage: mainImage ? URL.createObjectURL(mainImage) : (mainImageUrl || "https://images.unsplash.com/photo-1595428774223-ef52624120d2"),
       additionalImages: productToEdit?.additionalImages || [],
     };
 
