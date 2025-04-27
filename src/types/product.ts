@@ -19,3 +19,23 @@ export interface ProductFormValues {
   category: string;
   featured: boolean;
 }
+
+export interface Order {
+  id: string;
+  customer: string;
+  email: string;
+  date: string;
+  total: number;
+  status: "approved" | "shipped" | "delivered";
+  items: string[];
+}
+
+export interface Customer {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  city: string;
+  orders: number;
+  totalSpent: number;
+}

@@ -1,12 +1,15 @@
 
-import { Image, FileImage } from 'lucide-react';
-import { FormLabel } from "@/components/ui/form";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ImagePlus, ImageIcon, X } from "lucide-react";
 
 interface ProductImageUploadProps {
   mainImage: File | null;
   additionalImages: File[];
-  onMainImageChange: (file: File) => void;
-  onAdditionalImagesChange: (files: File[]) => void;
+  onMainImageChange: (image: File | null) => void;
+  onAdditionalImagesChange: (images: File[]) => void;
+  existingMainImageUrl?: string;
 }
 
 const ProductImageUpload = ({
@@ -14,87 +17,158 @@ const ProductImageUpload = ({
   additionalImages,
   onMainImageChange,
   onAdditionalImagesChange,
+  existingMainImageUrl,
 }: ProductImageUploadProps) => {
-  const handleMainImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
+  const [mainImagePreview, setMainImagePreview] = useState<string>("");
+  const [additionalImagePreviews, setAdditionalImagePreviews] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Set main image preview
+    if (mainImage) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setMainImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(mainImage);
+    } else if (existingMainImageUrl) {
+      setMainImagePreview(existingMainImageUrl);
+    } else {
+      setMainImagePreview("");
+    }
+
+    // Set additional image previews
+    const previews: string[] = [];
+    additionalImages.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        previews.push(reader.result as string);
+        if (previews.length === additionalImages.length) {
+          setAdditionalImagePreviews([...previews]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }, [mainImage, additionalImages, existingMainImageUrl]);
+
+  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
       onMainImageChange(e.target.files[0]);
     }
   };
 
-  const handleAdditionalImagesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newImages = Array.from(e.target.files);
-      if (additionalImages.length + newImages.length <= 3) {
-        onAdditionalImagesChange([...additionalImages, ...newImages]);
+  const handleAdditionalImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+      const totalFiles = [...additionalImages, ...newFiles];
+      
+      // Limit to 3 additional images
+      if (totalFiles.length > 3) {
+        alert("Solo se permiten hasta 3 imágenes adicionales");
+        onAdditionalImagesChange(totalFiles.slice(0, 3));
+      } else {
+        onAdditionalImagesChange(totalFiles);
       }
     }
   };
 
+  const removeAdditionalImage = (index: number) => {
+    const newImages = [...additionalImages];
+    newImages.splice(index, 1);
+    onAdditionalImagesChange(newImages);
+  };
+
+  const removeMainImage = () => {
+    onMainImageChange(null);
+  };
+
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <FormLabel>Imagen Principal</FormLabel>
-        <div
-          className={`h-28 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-electroestelar-orange transition-colors ${
-            mainImage ? "border-electroestelar-blue" : "border-gray-300"
-          }`}
-        >
-          <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center">
-            {mainImage ? (
+    <div className="space-y-4">
+      <div>
+        <p className="text-sm font-semibold mb-2">Imagen Principal</p>
+        <div className="flex items-center space-x-4">
+          {mainImagePreview ? (
+            <div className="relative">
               <img
-                src={URL.createObjectURL(mainImage)}
+                src={mainImagePreview}
                 alt="Vista previa"
-                className="w-full h-full object-cover rounded-lg"
+                className="h-24 w-24 object-cover rounded border"
               />
-            ) : (
-              <div className="flex flex-col items-center gap-1">
-                <Image className="w-6 h-6 text-gray-400" />
-                <span className="text-xs text-gray-500">Imagen principal</span>
-              </div>
-            )}
-            <input
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                className="absolute -top-2 -right-2 h-6 w-6"
+                onClick={removeMainImage}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          ) : (
+            <div className="h-24 w-24 flex items-center justify-center border-2 border-dashed border-gray-300 rounded">
+              <ImageIcon className="h-10 w-10 text-gray-400" />
+            </div>
+          )}
+          <div>
+            <Input
+              id="mainImage"
               type="file"
               accept="image/*"
+              onChange={handleMainImageChange}
               className="hidden"
-              onChange={handleMainImageUpload}
             />
-          </label>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => document.getElementById("mainImage")?.click()}
+            >
+              <ImagePlus className="mr-2 h-4 w-4" />
+              {mainImagePreview ? "Cambiar imagen" : "Subir imagen"}
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-2">
-        <FormLabel>Imágenes Adicionales</FormLabel>
-        <div className="grid grid-cols-3 gap-2">
-          {[...Array(3)].map((_, index) => (
-            <div
-              key={index}
-              className={`h-20 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-electroestelar-orange transition-colors ${
-                additionalImages[index] ? "border-electroestelar-blue" : "border-gray-300"
-              }`}
-            >
-              <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center">
-                {additionalImages[index] ? (
-                  <img
-                    src={URL.createObjectURL(additionalImages[index])}
-                    alt={`Imagen ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <FileImage className="w-4 h-4 text-gray-400" />
-                    <span className="text-[10px] text-gray-500">Imagen {index + 1}</span>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAdditionalImagesUpload}
-                  disabled={additionalImages.length >= 3 && !additionalImages[index]}
-                />
-              </label>
+      <div>
+        <p className="text-sm font-semibold mb-2">Imágenes Adicionales (Max. 3)</p>
+        <div className="flex flex-wrap gap-4">
+          {additionalImagePreviews.map((preview, index) => (
+            <div key={index} className="relative">
+              <img
+                src={preview}
+                alt={`Adicional ${index + 1}`}
+                className="h-16 w-16 object-cover rounded border"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                className="absolute -top-2 -right-2 h-5 w-5"
+                onClick={() => removeAdditionalImage(index)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
             </div>
           ))}
+          {additionalImages.length < 3 && (
+            <div>
+              <Input
+                id="additionalImages"
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleAdditionalImagesChange}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="h-16 w-16"
+                onClick={() => document.getElementById("additionalImages")?.click()}
+              >
+                <ImagePlus className="h-6 w-6" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

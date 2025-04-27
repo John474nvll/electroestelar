@@ -93,7 +93,13 @@ const OrdersList = () => {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {getStatusIcon(order.status)}
-                    <span>{getStatusText(order.status)}</span>
+                    <span className={
+                      order.status === "delivered" 
+                        ? "text-green-600 font-medium"
+                        : order.status === "shipped"
+                          ? "text-orange-600 font-medium"
+                          : "text-blue-600 font-medium"
+                    }>{getStatusText(order.status)}</span>
                   </div>
                 </TableCell>
               </TableRow>

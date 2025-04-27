@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
+import { Plus, Save } from "lucide-react";
 import * as z from "zod";
 import ProductImageUpload from "./ProductImageUpload";
 import ProductCategorySelect from "./ProductCategorySelect";
 import { ProductFormValues } from "@/types/product";
+import { Product } from "@/data/products";
 
 const formSchema = z.object({
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -22,36 +23,69 @@ const formSchema = z.object({
   featured: z.boolean().default(false),
 });
 
-const ProductForm = () => {
+interface ProductFormProps {
+  productToEdit?: Product;
+  onSubmitSuccess: (product: Product) => void;
+  onCancel: () => void;
+}
+
+const ProductForm = ({ productToEdit, onSubmitSuccess, onCancel }: ProductFormProps) => {
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [additionalImages, setAdditionalImages] = useState<File[]>([]);
+  const [mainImageUrl, setMainImageUrl] = useState<string>("");
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      price: "",
-      stock: "",
-      category: "",
-      featured: false,
+      name: productToEdit?.name || "",
+      description: productToEdit?.description || "",
+      price: productToEdit?.price ? String(productToEdit.price) : "",
+      stock: productToEdit?.stock ? String(productToEdit.stock) : "",
+      category: productToEdit?.category || "",
+      featured: productToEdit?.featured || false,
     },
   });
 
+  useEffect(() => {
+    if (productToEdit) {
+      form.reset({
+        name: productToEdit.name,
+        description: productToEdit.description,
+        price: String(productToEdit.price),
+        stock: productToEdit.stock ? String(productToEdit.stock) : "10", // Default value if not present
+        category: productToEdit.category,
+        featured: productToEdit.featured || false,
+      });
+      
+      setMainImageUrl(productToEdit.image);
+      // For a real app, we would also set additional images here
+    }
+  }, [productToEdit, form]);
+
   const onSubmit = async (data: ProductFormValues) => {
-    const formattedData = {
-      ...data,
+    const productId = productToEdit ? productToEdit.id : crypto.randomUUID();
+    
+    const formattedData: Product = {
+      id: productId,
+      name: data.name,
+      description: data.description,
       price: Number(data.price),
       stock: Number(data.stock),
-      mainImage: mainImage ? URL.createObjectURL(mainImage) : "",
-      additionalImages: additionalImages.map(img => URL.createObjectURL(img)),
-      id: crypto.randomUUID(),
+      category: data.category,
+      featured: data.featured,
+      image: mainImage ? URL.createObjectURL(mainImage) : (mainImageUrl || "https://images.unsplash.com/photo-1595428774223-ef52624120d2"),
+      // In a real app, we would handle the upload of these images to a server
+      additionalImages: productToEdit?.additionalImages || [],
     };
 
-    console.log("Nuevo producto:", formattedData);
-    form.reset();
-    setMainImage(null);
-    setAdditionalImages([]);
+    onSubmitSuccess(formattedData);
+    
+    if (!productToEdit) {
+      // Only reset if adding a new product
+      form.reset();
+      setMainImage(null);
+      setAdditionalImages([]);
+    }
   };
 
   return (
@@ -62,6 +96,7 @@ const ProductForm = () => {
           additionalImages={additionalImages}
           onMainImageChange={setMainImage}
           onAdditionalImagesChange={setAdditionalImages}
+          existingMainImageUrl={mainImageUrl}
         />
 
         <div className="grid grid-cols-2 gap-4">
@@ -146,9 +181,22 @@ const ProductForm = () => {
           )}
         />
 
-        <Button type="submit" className="w-full bg-electroestelar-orange hover:bg-electroestelar-orange/90">
-          <Plus className="mr-2 h-4 w-4" /> Añadir Producto
-        </Button>
+        <div className="flex justify-end space-x-2 pt-2">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button type="submit" className="bg-electroestelar-orange hover:bg-electroestelar-orange/90">
+            {productToEdit ? (
+              <>
+                <Save className="mr-2 h-4 w-4" /> Guardar Cambios
+              </>
+            ) : (
+              <>
+                <Plus className="mr-2 h-4 w-4" /> Añadir Producto
+              </>
+            )}
+          </Button>
+        </div>
       </form>
     </Form>
   );
