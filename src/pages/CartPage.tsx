@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { ShoppingCart, ArrowLeft, Trash2, AlertCircle } from 'lucide-react';
 import Layout from '@/components/Layout';
@@ -7,14 +6,14 @@ import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/utils/formatters';
 import QuantitySelector from '@/components/QuantitySelector';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
   const { items, removeFromCart, updateQuantity, clearCart, totalPrice } = useCart();
+  const navigate = useNavigate();
 
   const handleCheckout = () => {
-    toast.success("¡Gracias por tu compra!", {
-      description: "Este es un sitio de demostración, no se realizará ningún cargo."
-    });
+    navigate('/checkout');
   };
 
   return (
