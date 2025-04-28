@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Package, PackageCheck, Truck, Search, Filter } from "lucide-react";
+import { Package, PackageCheck, Truck, Search, Filter, Clock } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import AdminLayout from "@/components/AdminLayout";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -25,7 +25,7 @@ const mockOrders: Order[] = [
     email: "ana@example.com",
     date: "2024-04-28",
     total: 1250000,
-    status: "approved",
+    status: "pending",
     items: ["Smart TV 55\"", "Soundbar"],
   },
   {
@@ -34,7 +34,7 @@ const mockOrders: Order[] = [
     email: "carlos@example.com",
     date: "2024-04-27",
     total: 899000,
-    status: "shipped",
+    status: "approved",
     items: ["Laptop Gaming"],
   },
   {
@@ -43,7 +43,7 @@ const mockOrders: Order[] = [
     email: "sofia@example.com",
     date: "2024-04-26",
     total: 450000,
-    status: "delivered",
+    status: "shipped",
     items: ["Silla Ergonómica", "Mesa de Centro"],
   },
   {
@@ -52,7 +52,7 @@ const mockOrders: Order[] = [
     email: "luis@example.com",
     date: "2024-04-25",
     total: 1750000,
-    status: "approved",
+    status: "delivered",
     items: ["Refrigerador Side by Side"],
   },
   {
@@ -61,13 +61,15 @@ const mockOrders: Order[] = [
     email: "maria@example.com",
     date: "2024-04-24",
     total: 349000,
-    status: "shipped",
+    status: "pending",
     items: ["Audífonos Inalámbricos", "Parlante Bluetooth"],
   },
 ];
 
 const getStatusIcon = (status: string) => {
   switch (status) {
+    case "pending":
+      return <Clock className="text-yellow-500" />;
     case "approved":
       return <Package className="text-blue-500" />;
     case "shipped":
@@ -81,6 +83,8 @@ const getStatusIcon = (status: string) => {
 
 const getStatusText = (status: string) => {
   switch (status) {
+    case "pending":
+      return "Pendiente";
     case "approved":
       return "Pago Aprobado";
     case "shipped":
@@ -109,7 +113,7 @@ const OrdersManagement = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleStatusChange = (orderId: string, newStatus: "approved" | "shipped" | "delivered") => {
+  const handleStatusChange = (orderId: string, newStatus: "pending" | "approved" | "shipped" | "delivered") => {
     setOrders(prevOrders => 
       prevOrders.map(order => 
         order.id === orderId 
@@ -163,6 +167,7 @@ const OrdersManagement = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value="pending">Pendiente</SelectItem>
                 <SelectItem value="approved">Pago Aprobado</SelectItem>
                 <SelectItem value="shipped">En Camino</SelectItem>
                 <SelectItem value="delivered">Entregado</SelectItem>
@@ -296,6 +301,15 @@ const OrdersManagement = () => {
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Cambiar estado:</p>
                     <div className="flex flex-wrap gap-2">
+                      <Button 
+                        size="sm" 
+                        variant={selectedOrder.status === "pending" ? "default" : "outline"}
+                        onClick={() => handleStatusChange(selectedOrder.id, "pending")}
+                        className={selectedOrder.status === "pending" ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+                      >
+                        <Clock className="h-4 w-4 mr-2" /> 
+                        Pendiente
+                      </Button>
                       <Button 
                         size="sm" 
                         variant={selectedOrder.status === "approved" ? "default" : "outline"}

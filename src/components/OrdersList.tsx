@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Package, PackageCheck, Truck } from "lucide-react";
+import { Package, PackageCheck, Truck, Clock } from "lucide-react";
 
 // Mock data - this would come from your backend in a real application
 const orders = [
@@ -15,7 +15,7 @@ const orders = [
     id: "ORD001",
     date: "2024-04-26",
     total: 1250000,
-    status: "approved",
+    status: "pending",
     items: ["Smart TV 55\"", "Soundbar"],
   },
   {
@@ -36,6 +36,8 @@ const orders = [
 
 const getStatusIcon = (status: string) => {
   switch (status) {
+    case "pending":
+      return <Clock className="text-yellow-500" />;
     case "approved":
       return <Package className="text-blue-500" />;
     case "shipped":
@@ -49,6 +51,8 @@ const getStatusIcon = (status: string) => {
 
 const getStatusText = (status: string) => {
   switch (status) {
+    case "pending":
+      return "Pendiente";
     case "approved":
       return "Pago Aprobado";
     case "shipped":
@@ -98,7 +102,9 @@ const OrdersList = () => {
                         ? "text-green-600 font-medium"
                         : order.status === "shipped"
                           ? "text-orange-600 font-medium"
-                          : "text-blue-600 font-medium"
+                          : order.status === "pending"
+                            ? "text-yellow-600 font-medium"
+                            : "text-blue-600 font-medium"
                     }>{getStatusText(order.status)}</span>
                   </div>
                 </TableCell>

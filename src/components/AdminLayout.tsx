@@ -10,6 +10,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       name: "Productos",
       path: "/admin/products",
       icon: <Package size={20} />,
+    },
+    {
+      name: "Categorías",
+      path: "/admin/categories",
+      icon: <Layers size={20} />,
     },
     {
       name: "Clientes",

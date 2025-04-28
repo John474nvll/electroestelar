@@ -26,7 +26,7 @@ export interface Order {
   email: string;
   date: string;
   total: number;
-  status: "approved" | "shipped" | "delivered";
+  status: "pending" | "approved" | "shipped" | "delivered";
   items: string[];
 }
 
@@ -38,4 +38,17 @@ export interface Customer {
   city: string;
   orders: number;
   totalSpent: number;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+}
+
+export interface CategoryFormValues {
+  name: string;
+  description: string;
+  image: string;
 }
