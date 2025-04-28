@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { getProductById, getProductsByCategory } from '@/data/products';
+import { getProductById, getProductsByCategory, Product } from '@/data/products';
 import { formatPrice } from '@/utils/formatters';
 import { useCart } from '@/context/CartContext';
 import ProductCard from '@/components/ProductCard';
@@ -12,8 +12,8 @@ import QuantitySelector from '@/components/QuantitySelector';
 
 const ProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
-  const [product, setProduct] = useState<any>(null);
-  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [product, setProduct] = useState<Product | undefined>(undefined);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const { addToCart } = useCart();

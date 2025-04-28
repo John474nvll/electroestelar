@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import AdminLayout from "@/components/AdminLayout";
 import { IProduct } from "@/types/product";
-import { products } from "@/data/products";
+import { products, Product } from "@/data/products";
 import { ProductSearch } from "@/components/admin/products/ProductSearch";
 import { ProductList } from "@/components/admin/products/ProductList";
 import { ProductDialogs } from "@/components/admin/products/ProductDialogs";

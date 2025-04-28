@@ -1,15 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
-
-export type Product = {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  description: string;
-};
+import { Product } from '@/data/products';
 
 type CartItem = {
   product: Product;
