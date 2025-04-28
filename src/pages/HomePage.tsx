@@ -50,7 +50,7 @@ const HomePage = () => {
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <Link to="/category/furniture">
+              <Link to="/category/all">
                 <Button className="bg-electroestelar-orange hover:bg-electroestelar-orange/90 text-white">
                   Explorar ahora
                 </Button>
