@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ShoppingCart, Search, User } from 'lucide-react';
@@ -50,6 +49,18 @@ const Header = () => {
               {category.name}
             </Link>
           ))}
+          <Link 
+            to="/about"
+            className="text-electroestelar-blue hover:text-electroestelar-orange transition-colors"
+          >
+            Nosotros
+          </Link>
+          <Link 
+            to="/contact"
+            className="text-electroestelar-blue hover:text-electroestelar-orange transition-colors"
+          >
+            Contacto
+          </Link>
         </div>
         
         <div className="hidden md:flex items-center space-x-4">
@@ -111,6 +122,20 @@ const Header = () => {
                 {category.name}
               </Link>
             ))}
+            <Link 
+              to="/about"
+              className="text-electroestelar-blue hover:text-electroestelar-orange transition-colors py-2 border-b border-gray-100"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Nosotros
+            </Link>
+            <Link 
+              to="/contact"
+              className="text-electroestelar-blue hover:text-electroestelar-orange transition-colors py-2 border-b border-gray-100"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Contacto
+            </Link>
             <div className="py-2">
               <Button className="w-full flex items-center justify-center space-x-2">
                 <Search size={18} />

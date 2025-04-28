@@ -13,6 +13,8 @@ import CheckoutPage from "./pages/CheckoutPage";
 import UserPanel from "./pages/UserPanel";
 import NotFound from "./pages/NotFound";
 import AllCategoriesPage from "./pages/AllCategoriesPage";
+import ContactPage from "./pages/ContactPage";
+import AboutPage from "./pages/AboutPage";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -32,6 +34,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/category/all" element={<AllCategoriesPage />} />
             <Route path="/category/:categoryId" element={<CategoryPage />} />
             <Route path="/product/:productId" element={<ProductDetail />} />
