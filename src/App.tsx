@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +13,12 @@ import CheckoutPage from "./pages/CheckoutPage";
 import UserPanel from "./pages/UserPanel";
 import NotFound from "./pages/NotFound";
 import AllCategoriesPage from "./pages/AllCategoriesPage";
+
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import OrdersManagement from "./pages/admin/OrdersManagement";
+import ProductsManagement from "./pages/admin/ProductsManagement";
+import CustomersManagement from "./pages/admin/CustomersManagement";
 
 const queryClient = new QueryClient();
 
