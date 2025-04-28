@@ -1,4 +1,3 @@
-
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
@@ -33,21 +32,20 @@ const HomePage = () => {
     <Layout>
       {/* Hero Section */}
       <section className="relative h-[80vh] overflow-hidden -mt-20">
-        <div className="absolute inset-0 bg-gradient-to-r from-electroestelar-blue/90 to-electroestelar-darkblue/70" />
+        <div className="absolute inset-0 bg-black/50" />
         <div 
           className="absolute inset-0 bg-cover bg-center" 
           style={{ 
-            backgroundImage: "url('https://images.unsplash.com/photo-1600494603989-9650cf6ddd3d')",
-            filter: "contrast(1.1)"
+            backgroundImage: "url('https://images.unsplash.com/photo-1556228453-efd6c1ff04f6')",
           }}
         />
         
         <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-start text-white">
-          <div className="max-w-xl animate-fade-in">
+          <div className="max-w-xl backdrop-blur-sm bg-black/30 p-8 rounded-lg">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
               Tu hogar, <span className="text-electroestelar-orange">tu estilo</span>
             </h1>
-            <p className="text-lg md:text-xl opacity-90 mb-8">
+            <p className="text-lg md:text-xl text-white mb-8">
               Muebles, electrodomésticos y tecnología para transformar tus espacios con elegancia y funcionalidad.
             </p>
             
